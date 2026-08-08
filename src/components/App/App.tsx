@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast, { Toaster } from "react-hot-toast";
 
 import SearchBar from "../SearchBar/SearchBar";
-import MovieList from "../MovieGrid/MovieGrid";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import MovieModal from "../MovieModal/MovieModal";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 import { fetchMovies } from "../../services/movieService";
+
+import type { Movie } from "../../types/movie";
 
 import ReactPaginateModule from "react-paginate";
 import type { ReactPaginateProps } from "react-paginate";
@@ -26,22 +30,24 @@ const ReactPaginate = (
 
 export default function App() {
   const [query, setQuery] = useState("");
-
   const [page, setPage] = useState(1);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["movies", query, page],
-
     queryFn: () => fetchMovies(query, page),
-
     enabled: Boolean(query),
+    placeholderData: keepPreviousData,
   });
 
   const handleSearch = (value: string) => {
     setQuery(value);
-
     setPage(1);
   };
+
+  if (isSuccess && data.results.length === 0) {
+    toast.error("No movies found for your search.");
+  }
 
   return (
     <div className={css.container}>
@@ -55,7 +61,7 @@ export default function App() {
 
       {data && (
         <>
-          <MovieList movies={data.results} />
+          <MovieGrid movies={data.results} onSelect={setSelectedMovie} />
 
           {data.total_pages > 1 && (
             <ReactPaginate
@@ -72,6 +78,15 @@ export default function App() {
           )}
         </>
       )}
+
+      {selectedMovie && (
+        <MovieModal
+          movie={selectedMovie}
+          onClose={() => setSelectedMovie(null)}
+        />
+      )}
+
+      <Toaster />
     </div>
   );
 }

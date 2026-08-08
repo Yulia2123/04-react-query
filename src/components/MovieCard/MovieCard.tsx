@@ -1,17 +1,19 @@
 import type { Movie } from "../../types/movie";
+
 import css from "./MovieCard.module.css";
 
 interface MovieCardProps {
   movie: Movie;
+  onSelect: (movie: Movie) => void;
 }
 
-export default function MovieCard({ movie }: MovieCardProps) {
+export default function MovieCard({ movie, onSelect }: MovieCardProps) {
   const imageUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : "https://via.placeholder.com/500x750";
 
   return (
-    <li className={css.card}>
+    <li className={css.card} onClick={() => onSelect(movie)}>
       <img className={css.image} src={imageUrl} alt={movie.title} />
 
       <h3 className={css.title}>{movie.title}</h3>
