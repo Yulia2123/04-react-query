@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -39,6 +39,12 @@ export default function App() {
     enabled: Boolean(query),
     placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    if (isSuccess && data.results.length === 0) {
+      toast.error("No movies found for your search.");
+    }
+  }, [isSuccess, data]);
 
   const handleSearch = (value: string) => {
     setQuery(value);

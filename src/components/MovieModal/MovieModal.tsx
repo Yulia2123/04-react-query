@@ -1,4 +1,8 @@
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
+
 import type { Movie } from "../../types/movie";
+
 import css from "./MovieModal.module.css";
 
 interface MovieModalProps {
@@ -7,11 +11,28 @@ interface MovieModalProps {
 }
 
 export default function MovieModal({ movie, onClose }: MovieModalProps) {
-  const imageUrl = movie.poster_path
-    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "https://via.placeholder.com/500x750";
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
 
-  return (
+    document.addEventListener("keydown", handleKeyDown);
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  const imageUrl = movie.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+    : "https://via.placeholder.com/1280x720";
+
+  return createPortal(
     <div className={css.backdrop} onClick={onClose}>
       <div className={css.modal} onClick={(event) => event.stopPropagation()}>
         <button
@@ -41,6 +62,7 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
