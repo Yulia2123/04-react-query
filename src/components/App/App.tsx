@@ -51,10 +51,6 @@ export default function App() {
     setPage(1);
   };
 
-  if (isSuccess && data.results.length === 0) {
-    toast.error("No movies found for your search.");
-  }
-
   return (
     <div className={css.container}>
       <h1 className={css.title}>Movie Search</h1>

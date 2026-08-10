@@ -1,20 +1,11 @@
 import axios from "axios";
+import type { Movie } from "../types/movie";
 
 interface MoviesResponse {
   page: number;
   results: Movie[];
   total_pages: number;
   total_results: number;
-}
-
-interface Movie {
-  id: number;
-  title: string;
-  overview: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
-  vote_average: number;
-  release_date: string;
 }
 
 const axiosInstance = axios.create({
